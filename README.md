@@ -63,4 +63,6 @@ A Model de User conterá o esquema da tabela correspondente aos dados que irá c
 
 ## Criação de rota para visualização de todos os usuários
 
-## Criação de rota para visualização de um único usuário
+## Criação de rota para mostrar somente um usuário, informando o ID válido
+
+## Criação de rota para update de usuário

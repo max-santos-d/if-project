@@ -1,10 +1,9 @@
+import mongoose from "mongoose";
 import userServices from "../services/userServices.js";
 
 const store = async (req, res) => {
     try {
         const { name, username, email, password, avatar } = req.body;
-
-        console.log(req.body);
 
         if (!name || !username || !email || !password || !avatar)
             return res.send({ message: 'Campos obrigatórios em falta!' });
@@ -24,7 +23,7 @@ const store = async (req, res) => {
     } catch (err) {
         console.log(err);
         res.status(400).send({ message: err.message });
-    }
+    };
 };
 
 const index = async (req, res) => {
@@ -34,25 +33,55 @@ const index = async (req, res) => {
         return res.status(200).send(users);
     } catch (err) {
         console.log(err);
-        res.status(500).send({message: err.message});
-    }
+        res.status(500).send({ message: err.message });
+    };
 };
 
 const show = async (req, res) => {
-    try{
+    try {
         const user = await userServices.showService(req.params.id);
 
-        if (!user) return res.status(400).send({message: 'ID de usuário não encontrado!'});
+        if (!user) return res.status(400).send({ message: 'ID de usuário não encontrado!' });
 
         return res.status(200).send(user);
-    }catch (err) {
+    } catch (err) {
         console.log(err);
-        res.status(500).send({message: err.message});
-    }
-}
+        res.status(500).send({ message: err.message });
+    };
+};
+
+const update = async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        if(!mongoose.Types.ObjectId.isValid(id)) return res.status(400).send({message: 'ID de usuário inválido'});
+        
+        const {name, username, email, password, avatar} = req.body;
+        const user = await userServices.showService(id);
+
+        if(!user) return res.status(400).send({message: 'ID de usuário não encontrado!'});
+        if(!name && !username && !email && !password && !avatar) return res.status(400).send({message: 'Ao menos um campo de ve ser informado!'});
+
+        await userServices.updateService(
+            id,
+            name,
+            username,
+            email,
+            password,
+            avatar,
+        );
+
+        return res.status(200).send({message: 'Usuário atualizado!'});
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ message: err.message });
+    };
+};
 
 export default {
     store,
     index,
     show,
+    update,
 };
