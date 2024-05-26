@@ -53,3 +53,7 @@ Após a criação da conta, um banco de dados foi criado e será gerenciado pela
 
 ## Conxão com o banco de dados
 
+## Criação da Model de User
+
+A Model de User conterá o esquema da tabela correspondente aos dados que irá compor. Como o mongoDb não há critérios para incerção no banco de dados, o moongose é utilizado para criar regras para os dados que irão compor no banco chamado Schema.
+
