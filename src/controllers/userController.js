@@ -38,7 +38,21 @@ const index = async (req, res) => {
     }
 };
 
+const show = async (req, res) => {
+    try{
+        const user = await userServices.showService(req.params.id);
+
+        if (!user) return res.status(400).send({message: 'ID de usuário não encontrado!'});
+
+        return res.status(200).send(user);
+    }catch (err) {
+        console.log(err);
+        res.status(500).send({message: err.message});
+    }
+}
+
 export default {
     store,
     index,
+    show,
 };
