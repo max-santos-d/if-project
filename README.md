@@ -61,4 +61,4 @@ A Model de User conterá o esquema da tabela correspondente aos dados que irá c
 
 ## Implementação de funcionalidade de segurança para hash de senha
 
-## 
+## Criação de rota para visualização de todos os usuários

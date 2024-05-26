@@ -17,8 +17,8 @@ const store = async (req, res) => {
             avatar
         );
 
-        if(!user) return res.status(400).send({message: 'Erro ao criar usuário!'});
-        
+        if (!user) return res.status(400).send({ message: 'Erro ao criar usuário!' });
+
         res.status(200).send(user);
 
     } catch (err) {
@@ -27,6 +27,18 @@ const store = async (req, res) => {
     }
 };
 
+const index = async (req, res) => {
+    try {
+        const users = await userServices.indexService();
+
+        return res.status(200).send(users);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({message: err.message});
+    }
+};
+
 export default {
     store,
+    index,
 };
