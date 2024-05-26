@@ -66,3 +66,5 @@ A Model de User conterá o esquema da tabela correspondente aos dados que irá c
 ## Criação de rota para mostrar somente um usuário, informando o ID válido
 
 ## Criação de rota para update de usuário
+
+## Criação de middleware para verificação do ID de usuário informado

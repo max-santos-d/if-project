@@ -39,11 +39,7 @@ const index = async (req, res) => {
 
 const show = async (req, res) => {
     try {
-        const user = await userServices.showService(req.params.id);
-
-        if (!user) return res.status(400).send({ message: 'ID de usuário não encontrado!' });
-
-        return res.status(200).send(user);
+        return res.status(200).send(req.user);
     } catch (err) {
         console.log(err);
         res.status(500).send({ message: err.message });
@@ -51,15 +47,10 @@ const show = async (req, res) => {
 };
 
 const update = async (req, res) => {
-    try {
-        const id = req.params.id;
-
-        if(!mongoose.Types.ObjectId.isValid(id)) return res.status(400).send({message: 'ID de usuário inválido'});
-        
+    try {        
         const {name, username, email, password, avatar} = req.body;
-        const user = await userServices.showService(id);
+        const id = req.user._id;
 
-        if(!user) return res.status(400).send({message: 'ID de usuário não encontrado!'});
         if(!name && !username && !email && !password && !avatar) return res.status(400).send({message: 'Ao menos um campo de ve ser informado!'});
 
         await userServices.updateService(
@@ -72,7 +63,6 @@ const update = async (req, res) => {
         );
 
         return res.status(200).send({message: 'Usuário atualizado!'});
-
     } catch (err) {
         console.log(err);
         res.status(500).send({ message: err.message });
