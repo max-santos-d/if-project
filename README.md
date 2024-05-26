@@ -24,6 +24,7 @@ Mudança no formato de importação e exportação para o modelo EcmaScript ES6 
 
 Estruturando o projeto de forma organizada seguindo:
 
+~~~~text
 projeto/
 │   
 ├── src/
@@ -40,5 +41,15 @@ projeto/
 ├── package.json
 ├── package-lock.json
 └── README.md
+~~~~
 
 ## Inicialização do projeto com a códificação inicial do arquivo raiz `index.js`
+
+## Criação do banco de dados no MongoDB Atlas
+
+É necessario a criação de uma conta na plataforma do MongoDB Atlas, a conta pode ser feita de forma gratuia, assim como seu uso para estudo, de forma limitada.
+
+Após a criação da conta, um banco de dados foi criado e será gerenciado pela API.
+
+## Conxão com o banco de dados
+
