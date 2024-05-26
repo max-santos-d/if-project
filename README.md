@@ -59,4 +59,6 @@ A Model de User conterá o esquema da tabela correspondente aos dados que irá c
 
 ## Criação da rota, controller e service do user para funcionalidade de criação de um novo usuário no bd
 
+## Implementação de funcionalidade de segurança para hash de senha
+
 ## 
