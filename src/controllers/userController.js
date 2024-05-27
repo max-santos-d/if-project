@@ -69,9 +69,22 @@ const update = async (req, res) => {
     };
 };
 
+const del = async (req, res) => {
+    try {
+
+        const deleteUser = await userServices.deleteService(req.user._id);
+
+        return res.status(200).send(deleteUser);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ message: err.message });
+    };
+};
+
 export default {
     store,
     index,
     show,
     update,
+    del,
 };

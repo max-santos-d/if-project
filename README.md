@@ -70,3 +70,7 @@ A Model de User conterá o esquema da tabela correspondente aos dados que irá c
 ## Criação de middleware para verificação do ID de usuário informado
 
 ## Criação de rota para autenticação de usuário (login)
+
+## Criação de rota para deletar um usuário
+
+## 
