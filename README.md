@@ -73,4 +73,4 @@ A Model de User conterá o esquema da tabela correspondente aos dados que irá c
 
 ## Criação de rota para deletar um usuário
 
-## 
+## Criação de token para privatização de rotas com o jsonwebtoken
