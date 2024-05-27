@@ -1,9 +1,9 @@
-import express from 'express';
+import { Router } from "express";
 
 import userController from '../controllers/userController.js';
 import isValid from '../middlewares/globalMiddleware.js'
 
-const routes = express.Router();
+const routes = Router();
 
 routes.post('/', userController.store);
 routes.get('/', userController.index);
