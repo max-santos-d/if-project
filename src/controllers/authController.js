@@ -7,8 +7,6 @@ export const login = async (req, res) => {
 
     if (!email || !password) return res.status(404).send({ message: 'Email e Senha requerida!' });
     
-    console.log(req.body);
-
     try {
         const user = await loginService(email);
         
