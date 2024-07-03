@@ -14,7 +14,6 @@ const updateService = (
     username,
     email,
     password,
-    typeUser,
     avatar,
 ) => User.findByIdAndUpdate(
     { _id: id },
@@ -30,10 +29,13 @@ const updateService = (
 
 const deleteService = (id) => User.findByIdAndDelete({_id: id});
 
+const promotionService = (id) => User.findByIdAndUpdate({ _id: id }, {$set: {typeUser: ["organization", Date.now()]}});
+
 export default {
     storeService,
     indexService,
     showService,
     updateService,
     deleteService,
+    promotionService,
 };

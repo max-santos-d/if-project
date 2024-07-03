@@ -35,19 +35,16 @@ export const authMiddleware = (req, res, next) => {
 export const authMiddlewareAdm = async (req, res, next) => {
     try {
         const { userId } = req;
-        const { params: { id } } = req;
+        const { user: { _id } } = req;
         const user = await userServices.showService(userId);
+        const promoveUser = await userServices.showService(_id);
+
+        if (user.typeUser[0] !== 'administrator' && user.typeUser[0] !== 'organization') return res.status(400).send({ message: 'Sem permição para realizar a operação!' });
         
-        if (user.typeUser !== 'administrator' && user.typeUser !== 'organization') return res.status(400).send({ message: 'Sem permição para realizar a operação!' });
-        
-        const promoveUser = await userServices.showService(id)
-
-        res.status(200).send(promoveUser);
-
-        next();
-
+        req.promoveUser = promoveUser;
+        return next();
     } catch (err) {
         console.log(err);
-        res.status(400).send({ message: err.message });
+        res.status(400).send({ message: "Erro ao efetivar nível de autenticação!" });
     };
 }

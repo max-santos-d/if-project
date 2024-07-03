@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema({
         select: false,
     },
     typeUser: {
-        type: String,
+        type: Array,
         require: true,
     },
     avatar: {
