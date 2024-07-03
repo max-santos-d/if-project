@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 
-const storeService = (name, username, email, password, typeUser, avatar) =>
-    User.create({ name, username, email, password, typeUser, avatar });
+const storeService = (name, username, email, password, avatar) =>
+    User.create({ name, username, email, password, avatar });
 
 const indexService = () => User.find();
 
@@ -27,9 +27,27 @@ const updateService = (
     });
 
 
-const deleteService = (id) => User.findByIdAndDelete({_id: id});
+const deleteService = (id) => User.findByIdAndDelete({ _id: id });
 
-const promotionService = (id) => User.findByIdAndUpdate({ _id: id }, {$set: {typeUser: ["organization", Date.now()]}});
+const promotionOrganizationService = (id) => User.findOneAndUpdate(
+    { _id: id, 'typeUser.type': { $nin: ['organization'] } },
+    { $push: { typeUser: { type: 'organization', createdAt: new Date() } } }
+);
+
+const promotionAdministratorService = (id) => User.findOneAndUpdate(
+    { _id: id, 'typeUser.type': { $nin: ['administrator'] } },
+    { $push: { typeUser: { type: 'administrator', createdAt: new Date() } } }
+);
+
+const downgradeOrganizationService = (id) => EventPost.findOneAndUpdate(
+    { _id: id },
+    { $pull: { typeUser: 'organization' } }
+);
+
+const downgradeAdministratorService = (id) => EventPost.findOneAndUpdate(
+    { _id: id },
+    { $pull: { typeUser: 'administrator' } }
+);
 
 export default {
     storeService,
@@ -37,5 +55,8 @@ export default {
     showService,
     updateService,
     deleteService,
-    promotionService,
+    promotionOrganizationService,
+    promotionAdministratorService,
+    downgradeOrganizationService,
+    downgradeAdministratorService,
 };

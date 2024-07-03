@@ -58,4 +58,8 @@ Documentar toda a API com o Swagger
 
 modificação do Schema de users para diferenciação de tipos de usuários: administrador, organizador e usuário comum;
 
-implementação de funcionalidade para promover usuário comum em organizador
+implementação de funcionalidade para promoção de usuário comum para organizador e ajustes
+
+implementação de funcionalidade para remoção de promoção
+
+

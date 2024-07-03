@@ -176,7 +176,6 @@ const erase = async (req, res) => {
 const like = async (req, res) => {
 
     try {
-        // formato alternativo para desestruturação
         const { params: { id } } = req;
         const { userId } = req;
 

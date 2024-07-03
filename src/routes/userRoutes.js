@@ -12,6 +12,6 @@ routes.get('/:id', isValid, userController.show);
 routes.patch('/:id', authMiddleware, isValid, userController.update);
 routes.delete('/:id', authMiddleware, isValid, userController.erase);
 
-routes.patch('/promotion/:id', authMiddleware, isValid, authMiddlewareAdm, userController.promotion);
+routes.patch('/promotion/:id', authMiddleware, isValid, authMiddlewareAdm, userController.updateTypeUser);
 
 export default routes;

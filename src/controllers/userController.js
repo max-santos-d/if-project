@@ -3,8 +3,6 @@ import userServices from "../services/userServices.js";
 const store = async (req, res) => {
     try {
         const { name, username, email, password, avatar } = req.body;
-        const typeUser = ['user', Date.now()];       
-
 
         if (!name || !username || !email || !password || !avatar)
             return res.send({ message: 'Campos obrigatórios em falta!' });
@@ -14,7 +12,6 @@ const store = async (req, res) => {
             username,
             email,
             password,
-            typeUser,
             avatar
         );
 
@@ -82,17 +79,39 @@ const erase = async (req, res) => {
     };
 };
 
-const promotion = async (req, res) => {
-    try{
-        const { promoveUser } = req;
+const updateTypeUser = async (req, res) => {
+    try {
+        const { userId } = req;
+        const { userUpdate } = req;
+        const { query: { type } } = req;
+        const userReq = await userServices.showService(userId);
 
-        await userServices.promotionService(promoveUser._id);
+        console.log(userReq);
+
+        if (!type) return res.status(400).send({ message: 'Parâmetro de tipo de usuário deve ser informado!' });
+
+        switch (type) {
+            case 'organization':
+                await userServices.promotionOrganizationService(userUpdate._id);
+                break;
+            case 'administrator':
+                await userServices.promotionAdministratorService(userUpdate._id);
+                break;
+            case 'downOrganization':
+                await userServices.downgradeOrganizationService(userUpdate._id);
+                break;
+            case 'downAdministrator':
+                await userServices.downgradeAdministratorService(userUpdate._id);
+                break;
+            default:
+                return res.status(400).send({ message: 'Parâmetro para Modificação inválida' });
+        };
 
         return res.status(200).send({ message: 'Usuário atualizado!' });
     } catch (err) {
         console.log(err);
-        res.status(400).send({message: "Erro inesperado ao realizar ação!"});
-    }
+        res.status(400).send({ message: "Erro inesperado ao realizar ação!" });
+    };
 };
 
 export default {
@@ -101,5 +120,5 @@ export default {
     show,
     update,
     erase,
-    promotion,
+    updateTypeUser,
 };

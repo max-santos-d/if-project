@@ -24,7 +24,7 @@ const eraseService = (id) => EventPost.findByIdAndDelete({ _id: id });
     - o valor do campo especificado não está na matriz especificada ou
     - o campo especificado não existe.
 */
-// O $pushoperador acrescenta um valor especificado a uma matriz.
+// $push - operador que acrescenta um valor especificado a uma matriz.
 const likeService = (postId, userId) => EventPost.findOneAndUpdate(
     { _id: postId, 'likes.userId': { $nin: [userId] } },
     { $push: { likes: { userId, createdAt: new Date() } } }

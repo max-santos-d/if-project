@@ -19,11 +19,11 @@ export const authMiddleware = (req, res, next) => {
         jwt.verify(token, process.env.SECRET_JWT, async (err, decoded) => {
             if (err) return res.status(401).send({ message: 'Token inválido!' });
 
-            const user = await userServices.showService(decoded.id);
+            const userRequest = await userServices.showService(decoded.id);
 
-            if (!user || !user._id) return res.status(401).send({ message: 'Usuário inválido!' });
+            if (!userRequest || !userRequest._id) return res.status(401).send({ message: 'Usuário inválido!' });
 
-            req.userId = user._id;
+            req.userId = userRequest._id;
             return next();
         });
     } catch (err) {
@@ -36,15 +36,15 @@ export const authMiddlewareAdm = async (req, res, next) => {
     try {
         const { userId } = req;
         const { user: { _id } } = req;
-        const user = await userServices.showService(userId);
-        const promoveUser = await userServices.showService(_id);
+        const requestUser = await userServices.showService(userId);
+        const userUpdate = await userServices.showService(_id);
 
-        if (user.typeUser[0] !== 'administrator' && user.typeUser[0] !== 'organization') return res.status(400).send({ message: 'Sem permição para realizar a operação!' });
+        //if (requestUser.typeUser[0] !== 'administrator' && requestUser.typeUser[0] !== 'organization') return res.status(400).send({ message: 'Sem permição para realizar a operação!' });
         
-        req.promoveUser = promoveUser;
+        req.userUpdate = userUpdate;
         return next();
     } catch (err) {
         console.log(err);
         res.status(400).send({ message: "Erro ao efetivar nível de autenticação!" });
     };
-}
+};
