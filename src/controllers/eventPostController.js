@@ -49,6 +49,28 @@ const index = async (req, res) => {
 const show = async (req, res) => {
 
     try {
+
+        if (req.query.id) {
+            const eventPost = await eventPostServices.showService(req.query.id);
+
+            if (!eventPost) return res.statatus(400).send({ message: 'Noticia não encontrada!' });
+
+            return res.status(200).send({
+                eventPost: {
+                    id: eventPost._id,
+                    title: eventPost.title,
+                    text: eventPost.text,
+                    banner: eventPost.banner,
+                    likes: eventPost.likes,
+                    user: {
+                        name: eventPost.user.name,
+                        userName: eventPost.user.username,
+                        userAvatar: eventPost.user.avatar,
+                    }
+                },
+            });
+        };
+
         if (req.query.last) {
             if (req.query.last.toLowerCase() === 'true') {
                 const eventPost = await eventPostServices.showLastService();
