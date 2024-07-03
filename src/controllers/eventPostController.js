@@ -46,8 +46,42 @@ const index = async (req, res) => {
     };
 };
 
+const show = async (req, res) => {
+
+    try {
+        if (req.query.last) {
+            if (req.query.last.toLowerCase() === 'true') {
+                const eventPost = await eventPostServices.showLastService();
+
+                if (!eventPost) return res.statatus(400).send({ message: 'Não há notícias cadastradas!' });
+
+                return res.status(200).send({
+                    eventPost: {
+                        id: eventPost._id,
+                        title: eventPost.title,
+                        text: eventPost.text,
+                        banner: eventPost.banner,
+                        likes: eventPost.likes,
+                        user: {
+                            name: eventPost.user.name,
+                            userName: eventPost.user.username,
+                            userAvatar: eventPost.user.avatar,
+                        }
+                    },
+                });
+            };
+        };
+
+        return res.status(400).send({ message: 'Nenhum parâmetro informado.' });
+
+    } catch (err) {
+        console.log(err);
+        return res.send({ message: 'Noticia não encontrada!' })
+    };
+};
 
 export default {
     store,
     index,
+    show,
 };
