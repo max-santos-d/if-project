@@ -50,27 +50,6 @@ const show = async (req, res) => {
 
     try {
 
-        if (req.query.id) {
-            const eventPost = await eventPostServices.showService(req.query.id);
-
-            if (!eventPost) return res.statatus(400).send({ message: 'Noticia não encontrada!' });
-
-            return res.status(200).send({
-                eventPost: {
-                    id: eventPost._id,
-                    title: eventPost.title,
-                    text: eventPost.text,
-                    banner: eventPost.banner,
-                    likes: eventPost.likes,
-                    user: {
-                        name: eventPost.user.name,
-                        userName: eventPost.user.username,
-                        userAvatar: eventPost.user.avatar,
-                    }
-                },
-            });
-        };
-
         if (req.query.last) {
             if (req.query.last.toLowerCase() === 'true') {
                 const eventPost = await eventPostServices.showLastService();
@@ -92,6 +71,48 @@ const show = async (req, res) => {
                     },
                 });
             };
+        };
+
+        if (req.query.id) {
+            const eventPost = await eventPostServices.showService(req.query.id);
+
+            if (!eventPost) return res.statatus(400).send({ message: 'Noticia não encontrada!' });
+
+            return res.status(200).send({
+                eventPost: {
+                    id: eventPost._id,
+                    title: eventPost.title,
+                    text: eventPost.text,
+                    banner: eventPost.banner,
+                    likes: eventPost.likes,
+                    user: {
+                        name: eventPost.user.name,
+                        userName: eventPost.user.username,
+                        userAvatar: eventPost.user.avatar,
+                    }
+                },
+            });
+        };
+
+        if (req.query.title) {
+            const eventPost = await eventPostServices.showByTitleService(req.query.title);
+
+            if (!eventPost.length) return res.status(400).send({ message: 'Nenhuma noticia com o título' });
+
+            return res.status(200).send({
+                result: eventPost.map(item => ({
+                    id: item._id,
+                    title: item.title,
+                    text: item.text,
+                    banner: item.banner,
+                    likes: item.likes,
+                    user: {
+                        name: item.user.name,
+                        userName: item.user.username,
+                        userAvatar: item.user.avatar
+                    }
+                })),
+            });
         };
 
         return res.status(400).send({ message: 'Nenhum parâmetro informado.' });
