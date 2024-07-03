@@ -127,18 +127,20 @@ const show = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        const { title, text, banner } = req.body;
-        const id = req.params.id || '';
+        const { body: { title, text, banner } } = req;
+        const { params: { userId } } = req;
+        const postId = req.params.id || '';
+        const validPostId = mongoose.Types.ObjectId.isValid(postId);
 
-        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).send({ message: 'ID de Post inválido!' });
+        if(!validPostId) return res.status(400).send({ message: 'ID de Post inválido!' });
 
-        const eventPost = await eventPostServices.showService(id);
+        const eventPost = await eventPostServices.showService(postId);
 
         if (!eventPost) return res.status(400).send({ message: 'Post não encontrado!' });
         if (!title && !text && !banner) return res.status(400).send({ message: 'Ao menos um campo obrigatório deve ser informado: title, text ou banner.' })
 
         await eventPostServices.updateService(
-            id,
+            postId,
             title,
             text,
             banner,
@@ -174,17 +176,17 @@ const like = async (req, res) => {
 
     try {
         // formato alternativo para desestruturação
-        const { query: { idPost } } = req;
-        const { query: { idUser } } = req;
+        const {params: {id}} = req;
+        const { userId } = req;
 
-        if (!mongoose.Types.ObjectId.isValid(idPost)) return res.status(400).send({ message: 'ID Post inválido!' });
+        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).send({ message: 'ID Post inválido!' });
 
-        const like = await eventPostServices.likeService(idPost, idUser);
+        const like = await eventPostServices.likeService(id, userId);
 
-        if(!like) {
-            await eventPostServices.deleteLikeService(idPost, idUser);
-            return res.status(200).send({message: 'LIKE removido!'})
-        }; 
+        if (!like) {
+            await eventPostServices.deleteLikeService(id, userId);
+            return res.status(200).send({ message: 'LIKE removido!' })
+        };
 
         return res.status(200).send({ message: 'LIKE adicionado!' });
 
