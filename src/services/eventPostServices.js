@@ -18,6 +18,8 @@ const showByTitleService = (title) => EventPost.find(
 
 const updateService = (id, title, text, banner) => EventPost.findByIdAndUpdate({ _id: id }, { title, text, banner });
 
+const eraseService = (id) => EventPost.findByIdAndDelete({ _id: id });
+
 export default {
     store,
     indexService,
@@ -25,4 +27,6 @@ export default {
     showService,
     showByTitleService,
     updateService,
+    eraseService,
+    likeService,
 };

@@ -17,7 +17,7 @@ const store = async (req, res) => {
             user: "66539b63b2d59341761156d4",
         });
 
-        return res.status(201).send({ message: 'Notícia cadastrada!' });
+        return res.status(201).send({ message: 'Post cadastrado!' });
     } catch (err) {
         console.log(err);
         return res.status(400).send({ message: err.message })
@@ -44,7 +44,7 @@ const index = async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        return res.send({ message: 'Não há notícias cadastradas!' })
+        return res.send({ message: 'Não há Posts cadastrados!' })
     };
 };
 
@@ -56,7 +56,7 @@ const show = async (req, res) => {
             if (req.query.last.toLowerCase() === 'true') {
                 const eventPost = await eventPostServices.showLastService();
 
-                if (!eventPost) return res.statatus(400).send({ message: 'Não há notícias cadastradas!' });
+                if (!eventPost) return res.statatus(400).send({ message: 'Não há Posts cadastrados!' });
 
                 return res.status(200).send({
                     eventPost: {
@@ -78,7 +78,7 @@ const show = async (req, res) => {
         if (req.query.id) {
             const eventPost = await eventPostServices.showService(req.query.id);
 
-            if (!eventPost) return res.statatus(400).send({ message: 'Noticia não encontrada!' });
+            if (!eventPost) return res.statatus(400).send({ message: 'Post não encontrado!' });
 
             return res.status(200).send({
                 eventPost: {
@@ -99,7 +99,7 @@ const show = async (req, res) => {
         if (req.query.title) {
             const eventPost = await eventPostServices.showByTitleService(req.query.title);
 
-            if (!eventPost.length) return res.status(400).send({ message: 'Nenhuma noticia com o título' });
+            if (!eventPost.length) return res.status(400).send({ message: 'Nenhum Post com o título' });
 
             return res.status(200).send({
                 result: eventPost.map(item => ({
@@ -121,7 +121,7 @@ const show = async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        return res.send({ message: 'Noticia não encontrada!' })
+        return res.send({ message: 'Post não encontrado!' })
     };
 };
 
@@ -130,11 +130,11 @@ const update = async (req, res) => {
         const { title, text, banner } = req.body;
         const id = req.params.id || '';
 
-        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).send({ message: 'ID de News inválida!' });
+        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).send({ message: 'ID de Post inválido!' });
 
         const eventPost = await eventPostServices.showService(id);
 
-        if(!eventPost) return res.status(400).send({message: 'News não encontrada!'});
+        if(!eventPost) return res.status(400).send({message: 'Post não encontrado!'});
         if (!title && !text && !banner) return res.status(400).send({ message: 'Ao menos um campo obrigatório deve ser informado: title, text ou banner.' })
 
         await eventPostServices.updateService(
@@ -144,11 +144,30 @@ const update = async (req, res) => {
             banner,
         );
 
-        return res.status(200).send({ message: 'News atualizada!' });
+        return res.status(200).send({ message: 'Post atualizado!' });
     } catch (err) {
         console.log(err);
         res.status(400).send({ message: err.message });
     }
+};
+
+const erase = async (req, res) => {
+    try {
+        const id = req.params.id;
+        
+        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).send({ message: 'ID Post inválido!' });
+        
+        const eventPost = await eventPostServices.showService(id);
+
+        if(!eventPost) return res.status(400).send({message: 'Post não encontrado!'});
+
+        await eventPostServices.eraseService(id);
+        res.status(200).send({message: 'Post Apagado!'});
+
+    }catch (err) {
+        console.log(err);
+        res.status(400).send({message: err.message});
+    }    
 };
 
 export default {
@@ -156,4 +175,5 @@ export default {
     index,
     show,
     update,
+    erase,
 };
