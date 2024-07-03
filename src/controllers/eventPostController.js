@@ -6,6 +6,9 @@ import eventPostServices from '../services/eventPostServices.js';
 const store = async (req, res) => {
     try {
         const { title, text, banner } = req.body;
+        const {userId} = req;
+
+        console.log(userId);
 
         if (!title || !text || !banner)
             return res.send({ message: "Campos obrigatórios em falta!" });
@@ -14,7 +17,7 @@ const store = async (req, res) => {
             title,
             text,
             banner,
-            user: "66539b63b2d59341761156d4",
+            user: userId,
         });
 
         return res.status(201).send({ message: 'Post cadastrado!' });
@@ -128,7 +131,6 @@ const show = async (req, res) => {
 const update = async (req, res) => {
     try {
         const { body: { title, text, banner } } = req;
-        const { params: { userId } } = req;
         const postId = req.params.id || '';
         const validPostId = mongoose.Types.ObjectId.isValid(postId);
 
