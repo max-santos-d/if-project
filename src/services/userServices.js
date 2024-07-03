@@ -1,8 +1,7 @@
-import userController from "../controllers/userController.js";
 import User from "../models/User.js";
 
-const storeService = (name, username, email, password, avatar) =>
-    User.create({ name, username, email, password, avatar });
+const storeService = (name, username, email, password, typeUser, avatar) =>
+    User.create({ name, username, email, password, typeUser, avatar });
 
 const indexService = () => User.find();
 
@@ -15,6 +14,7 @@ const updateService = (
     username,
     email,
     password,
+    typeUser,
     avatar,
 ) => User.findByIdAndUpdate(
     { _id: id },
@@ -23,6 +23,7 @@ const updateService = (
         username,
         email,
         password,
+        typeUser,
         avatar,
     });
 

@@ -1,9 +1,10 @@
-import mongoose from "mongoose";
 import userServices from "../services/userServices.js";
 
 const store = async (req, res) => {
     try {
         const { name, username, email, password, avatar } = req.body;
+        const typeUser = 'user';       
+
 
         if (!name || !username || !email || !password || !avatar)
             return res.send({ message: 'Campos obrigatórios em falta!' });
@@ -13,6 +14,7 @@ const store = async (req, res) => {
             username,
             email,
             password,
+            typeUser,
             avatar
         );
 
@@ -47,11 +49,11 @@ const show = async (req, res) => {
 };
 
 const update = async (req, res) => {
-    try {        
-        const {name, username, email, password, avatar} = req.body;
+    try {
+        const { name, username, email, password, avatar } = req.body;
         const id = req.user._id;
 
-        if(!name && !username && !email && !password && !avatar) return res.status(400).send({message: 'Ao menos um campo de ve ser informado!'});
+        if (!name && !username && !email && !password && !avatar) return res.status(400).send({ message: 'Ao menos um campo de ve ser informado!' });
 
         await userServices.updateService(
             id,
@@ -62,14 +64,14 @@ const update = async (req, res) => {
             avatar,
         );
 
-        return res.status(200).send({message: 'Usuário atualizado!'});
+        return res.status(200).send({ message: 'Usuário atualizado!' });
     } catch (err) {
         console.log(err);
         res.status(500).send({ message: err.message });
     };
 };
 
-const del = async (req, res) => {
+const erase = async (req, res) => {
     try {
 
         const deleteUser = await userServices.deleteService(req.user._id);
@@ -81,10 +83,15 @@ const del = async (req, res) => {
     };
 };
 
+const promotion = async (req, res) => {
+
+};
+
 export default {
     store,
     index,
     show,
     update,
-    del,
+    erase,
+    promotion,
 };

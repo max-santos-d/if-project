@@ -21,10 +21,21 @@ const UserSchema = new mongoose.Schema({
         type: String,
         require: true,
         select: false,
-
+    },
+    typeUser: {
+        type: String,
+        require: true,
     },
     avatar: {
         type: String,
+        require: true,
+    },
+    favoriteEvents: {
+        type: Array,
+        require: true,
+    },
+    favoriteQuestions: {
+        type: Array,
         require: true,
     },
 });

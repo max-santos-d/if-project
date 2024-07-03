@@ -1,4 +1,3 @@
-// import mongoose from 'mongoose';
 import mongoose from 'mongoose';
 
 import eventPostServices from '../services/eventPostServices.js';
@@ -6,7 +5,7 @@ import eventPostServices from '../services/eventPostServices.js';
 const store = async (req, res) => {
     try {
         const { title, text, banner } = req.body;
-        const {userId} = req;
+        const { userId } = req;
 
         console.log(userId);
 
@@ -134,7 +133,7 @@ const update = async (req, res) => {
         const postId = req.params.id || '';
         const validPostId = mongoose.Types.ObjectId.isValid(postId);
 
-        if(!validPostId) return res.status(400).send({ message: 'ID de Post inválido!' });
+        if (!validPostId) return res.status(400).send({ message: 'ID de Post inválido!' });
 
         const eventPost = await eventPostServices.showService(postId);
 
@@ -178,7 +177,7 @@ const like = async (req, res) => {
 
     try {
         // formato alternativo para desestruturação
-        const {params: {id}} = req;
+        const { params: { id } } = req;
         const { userId } = req;
 
         if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).send({ message: 'ID Post inválido!' });
