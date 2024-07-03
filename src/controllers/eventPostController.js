@@ -22,7 +22,32 @@ const store = async (req, res) => {
     };
 };
 
+const index = async (req, res) => {
+
+    try {
+        const eventPost = await eventPostServices.indexService();
+
+        return res.status(200).send(eventPost.map(item => ({
+            id: item._id,
+            title: item.title,
+            text: item.text,
+            banner: item.banner,
+            likes: item.likes,
+            user: {
+                name: item.user.name,
+                userName: item.user.username,
+                userAvatar: item.user.avatar
+            }
+        })));
+
+    } catch (err) {
+        console.log(err);
+        return res.send({ message: 'Não há notícias cadastradas!' })
+    };
+};
+
 
 export default {
     store,
+    index,
 };
