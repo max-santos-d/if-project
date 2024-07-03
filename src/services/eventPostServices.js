@@ -16,10 +16,13 @@ const showByTitleService = (title) => EventPost.find(
     })
     .sort({ _id: -1 }).populate('user');
 
+const updateService = (id, title, text, banner) => EventPost.findByIdAndUpdate({ _id: id }, { title, text, banner });
+
 export default {
     store,
     indexService,
     showLastService,
     showService,
     showByTitleService,
+    updateService,
 };

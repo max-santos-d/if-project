@@ -1,4 +1,6 @@
 // import mongoose from 'mongoose';
+import mongoose from 'mongoose';
+
 import eventPostServices from '../services/eventPostServices.js';
 
 const store = async (req, res) => {
@@ -123,8 +125,35 @@ const show = async (req, res) => {
     };
 };
 
+const update = async (req, res) => {
+    try {
+        const { title, text, banner } = req.body;
+        const id = req.params.id || '';
+
+        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).send({ message: 'ID de News inválida!' });
+
+        const eventPost = await eventPostServices.showService(id);
+
+        if(!eventPost) return res.status(400).send({message: 'News não encontrada!'});
+        if (!title && !text && !banner) return res.status(400).send({ message: 'Ao menos um campo obrigatório deve ser informado: title, text ou banner.' })
+
+        await eventPostServices.updateService(
+            id,
+            title,
+            text,
+            banner,
+        );
+
+        return res.status(200).send({ message: 'News atualizada!' });
+    } catch (err) {
+        console.log(err);
+        res.status(400).send({ message: err.message });
+    }
+};
+
 export default {
     store,
     index,
     show,
+    update,
 };
