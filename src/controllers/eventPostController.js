@@ -134,7 +134,7 @@ const update = async (req, res) => {
 
         const eventPost = await eventPostServices.showService(id);
 
-        if(!eventPost) return res.status(400).send({message: 'Post não encontrado!'});
+        if (!eventPost) return res.status(400).send({ message: 'Post não encontrado!' });
         if (!title && !text && !banner) return res.status(400).send({ message: 'Ao menos um campo obrigatório deve ser informado: title, text ou banner.' })
 
         await eventPostServices.updateService(
@@ -154,20 +154,44 @@ const update = async (req, res) => {
 const erase = async (req, res) => {
     try {
         const id = req.params.id;
-        
+
         if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).send({ message: 'ID Post inválido!' });
-        
+
         const eventPost = await eventPostServices.showService(id);
 
-        if(!eventPost) return res.status(400).send({message: 'Post não encontrado!'});
+        if (!eventPost) return res.status(400).send({ message: 'Post não encontrado!' });
 
         await eventPostServices.eraseService(id);
-        res.status(200).send({message: 'Post Apagado!'});
+        res.status(200).send({ message: 'Post Apagado!' });
 
-    }catch (err) {
+    } catch (err) {
         console.log(err);
-        res.status(400).send({message: err.message});
-    }    
+        res.status(400).send({ message: err.message });
+    }
+};
+
+const like = async (req, res) => {
+
+    try {
+        // formato alternativo para desestruturação
+        const { query: { idPost } } = req;
+        const { query: { idUser } } = req;
+
+        if (!mongoose.Types.ObjectId.isValid(idPost)) return res.status(400).send({ message: 'ID Post inválido!' });
+
+        const like = await eventPostServices.likeService(idPost, idUser);
+
+        if(!like) {
+            await eventPostServices.deleteLikeService(idPost, idUser);
+            return res.status(200).send({message: 'LIKE removido!'})
+        }; 
+
+        return res.status(200).send({ message: 'LIKE adicionado!' });
+
+    } catch (err) {
+        console.log(err);
+        res.status(400).send({ message: err.message });
+    }
 };
 
 export default {
@@ -176,4 +200,5 @@ export default {
     show,
     update,
     erase,
+    like,
 };

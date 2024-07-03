@@ -20,6 +20,21 @@ const updateService = (id, title, text, banner) => EventPost.findByIdAndUpdate({
 
 const eraseService = (id) => EventPost.findByIdAndDelete({ _id: id });
 
+/*$nin - seleciona os documentos onde:
+    - o valor do campo especificado não está na matriz especificada ou
+    - o campo especificado não existe.
+*/
+// O $pushoperador acrescenta um valor especificado a uma matriz.
+const likeService = (postId, userId) => EventPost.findOneAndUpdate(
+    { _id: postId, 'likes.userId': { $nin: [userId] } },
+    { $push: { likes: { userId, createdAt: new Date() } } }
+);
+
+const deleteLikeService = (postId, userId) => EventPost.findOneAndUpdate(
+    { _id: postId },
+    { $pull: { likes: { userId } } }
+);
+
 export default {
     store,
     indexService,
@@ -29,4 +44,5 @@ export default {
     updateService,
     eraseService,
     likeService,
+    deleteLikeService,
 };
