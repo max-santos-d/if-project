@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import connectDatabase from './src/database/db.js';
 import userRoutes from './src/routes/userRoutes.js';
 import authRoutes from './src/routes/authRouters.js';
+import postEventRoutes from './src/routes/eventPostRoutes.js';
 
 dotenv.config();
 connectDatabase();
@@ -15,6 +16,7 @@ app.use(express.json());
 
 app.use('/user', userRoutes);
 app.use('/auth', authRoutes);
+app.use('/postEvent', postEventRoutes);
 
 app.listen(port, () => {
     console.log('')
