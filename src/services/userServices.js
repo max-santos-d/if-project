@@ -39,14 +39,14 @@ const promotionAdministratorService = (id) => User.findOneAndUpdate(
     { $push: { typeUser: { type: 'administrator', createdAt: new Date() } } }
 );
 
-const downgradeOrganizationService = (id) => EventPost.findOneAndUpdate(
+const downgradeOrganizationService = (id) => User.findOneAndUpdate(
     { _id: id },
-    { $pull: { typeUser: 'organization' } }
+    { $pull: { typeUser: { type: 'organization' } } }
 );
 
-const downgradeAdministratorService = (id) => EventPost.findOneAndUpdate(
+const downgradeAdministratorService = (id) => User.findOneAndUpdate(
     { _id: id },
-    { $pull: { typeUser: 'administrator' } }
+    { $pull: { typeUser: { type: 'administrator' } } }
 );
 
 export default {
