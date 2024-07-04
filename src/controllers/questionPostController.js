@@ -33,7 +33,23 @@ const index = async (req, res) => {
     };
 };
 
+const show = async (req, res) => {
+    try{
+
+        console.log(req.post);
+
+        res.status(200).send(req.post);
+
+        // continuar ...
+
+    }catch (err) {
+        console.log(err);
+        return res.status(400).send({message: 'Erro inisperado ao realizar requisição!'});
+    };
+};
+
 export default {
     store,
     index,
+    show,
 };
