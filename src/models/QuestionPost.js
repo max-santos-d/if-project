@@ -12,9 +12,9 @@ const QuestionPostSchema = new mongoose.Schema({
         type: String,
         require: true,
     }],
-    createdAt: {
-        type: String,
-        default: Date.now(),
+    status: {
+        type: Boolean,
+        default: true,
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -25,7 +25,15 @@ const QuestionPostSchema = new mongoose.Schema({
         type: Array,
         require: true,
     },
-});
+},
+    // Adicionando campos created_at e updated_at automaticamente
+    {
+        timestamps: {
+            createdAt: 'created_at',
+            updatedAt: 'updated_at'
+        }
+    }
+);
 
 const QuestionPost = mongoose.model('QuestionPost', QuestionPostSchema);
 
