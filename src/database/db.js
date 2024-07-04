@@ -1,11 +1,12 @@
-import mongoose, { connect } from "mongoose";
+import mongoose, { connect } from "mongoose"; // ou imprtar direto - import {connect} from "mongoose";
 
-const connectDatabase = () => {
-    console.log('Conectando...');
+export default () => {
+    return new Promise((resolve, regect) => {
 
-    mongoose.connect(process.env.MONGO_URI)
-        .then(() => console.log('MongoDB Atlas Conectado'))
-        .catch((err) => { console.log(err) });
+        console.log('Conectando...');
+        
+        mongoose.connect(process.env.MONGO_URI)
+            .then(() => resolve(console.log('MongoDB Atlas Conectado')))
+            .catch((err) => regect (console.log(err)) )    
+    });    
 };
-
-export default connectDatabase;

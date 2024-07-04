@@ -10,11 +10,11 @@ export const login = async (req, res) => {
     try {
         const user = await loginService(email);
         
-        if (!user) return res.status(404).send({ message: 'Usuário ou senha incorreta!' });
+        if (!user) return res.status(404).send({ message: 'Usuário não encontrado!' });
         
         const passwordIsValisd = bcrypt.compareSync(password, user.password);
 
-        if (!passwordIsValisd) return res.status(404).send({ message: 'Usuário ou senha incorreta!' });
+        if (!passwordIsValisd) return res.status(404).send({ message: 'Usuário não encontrado!' });
 
         const token = genereteTokenService(user._id)
 
