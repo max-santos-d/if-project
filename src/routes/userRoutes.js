@@ -6,7 +6,7 @@ import { isValid } from '../middlewares/globalMiddleware.js';
 
 const routes = Router();
 
-routes.post('/', authMiddleware, userController.store);
+routes.post('/', userController.store);
 routes.get('/', userController.index);
 routes.get('/:id', isValid, userController.show);
 routes.patch('/:id', authMiddleware, isValid, userController.update);

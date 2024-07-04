@@ -74,9 +74,14 @@ const update = async (req, res) => {
 
 const erase = async (req, res) => {
     try {
-        const deleteUser = await userServices.deleteService(req.user._id);
+        const { _id: idToken } = req.userId;
+        const { _id: idReq } = req.user;
 
-        return res.status(200).send(deleteUser);
+        if(String(idToken) !== String(idReq)) return res.status(400).send({ message: 'Falha na requisição - Você não tem acesso ao usuário!' });
+        
+        await userServices.deleteService(req.user._id);
+
+        return res.status(200).send({ message: 'Usuário Apagado!' });
     } catch (err) {
         console.log(err);
         res.status(500).send({ message: err.message });
