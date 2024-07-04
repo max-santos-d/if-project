@@ -38,10 +38,12 @@ export const authMiddlewareAdm = async (req, res, next) => {
         const { user: { _id } } = req;
         const requestUser = await userServices.showService(userId);
         const userUpdate = await userServices.showService(_id);
+        const testTypeRequestUser = requestUser.typeUser.find((el) => el.type === 'administrator');
 
-        //if (requestUser.typeUser[0] !== 'administrator' && requestUser.typeUser[0] !== 'organization') return res.status(400).send({ message: 'Sem permição para realizar a operação!' });
-        
+        if (!testTypeRequestUser) return res.status(400).send({ message: 'Sem permição para realizar a operação!' });
+
         req.userUpdate = userUpdate;
+        req.requestUser = requestUser;
         return next();
     } catch (err) {
         console.log(err);

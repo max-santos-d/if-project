@@ -50,7 +50,8 @@ const update = async (req, res) => {
         const { name, username, email, password, avatar } = req.body;
         const id = req.user._id;
 
-        if (!name && !username && !email && !password && !avatar) return res.status(400).send({ message: 'Ao menos um campo de ve ser informado!' });
+        if (!name && !username && !email && !password && !avatar)
+            return res.status(400).send({ message: 'Ao menos um campo de ve ser informado!' });
 
         await userServices.updateService(
             id,
@@ -81,12 +82,9 @@ const erase = async (req, res) => {
 
 const updateTypeUser = async (req, res) => {
     try {
-        const { userId } = req;
+        const { requestUser } = req;
         const { userUpdate } = req;
         const { query: { type } } = req;
-        const userReq = await userServices.showService(userId);
-
-        console.log(userReq);
 
         if (!type) return res.status(400).send({ message: 'Parâmetro de tipo de usuário deve ser informado!' });
 
@@ -101,6 +99,23 @@ const updateTypeUser = async (req, res) => {
                 await userServices.downgradeOrganizationService(userUpdate._id);
                 break;
             case 'downAdministrator':
+
+                /* 
+                tentar arrumar, 
+                usuários com tipo adm podem realizar o procedimento em quem não tem o tipo adm
+                se o usuário também for do tipo adm, o procedimento so pode ser finalizado se o usuário que esta requisitando for adm mais velho.
+                quem tem o tipo adm e tenta realizar a mudança para um usuário, que tem esse tipo, e ele recebeu primeiro, o procedimento n deve acontecer 
+                */
+                const typeUserUpdate = userUpdate.typeUser.find((el) => el.type === 'administrator');
+
+                if(typeUserUpdate){
+                    const createBefore = requestUser.typeUser.find(async (el) => el.createdAt > typeUserUpdate.createdAt);
+
+                    console.log(createBefore)
+                    
+                    if (!createBefore) return res.status(400).send({ message: 'Não é possivel realizar a operação por o usuário ter criação mais antiga' });                 
+                }
+
                 await userServices.downgradeAdministratorService(userUpdate._id);
                 break;
             default:
