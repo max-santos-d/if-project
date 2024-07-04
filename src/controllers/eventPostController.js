@@ -7,8 +7,6 @@ const store = async (req, res) => {
         const { title, text, banner } = req.body;
         const { userId } = req;
 
-        console.log(userId);
-
         if (!title || !text || !banner)
             return res.send({ message: "Campos obrigatórios em falta!" });
 
@@ -19,7 +17,7 @@ const store = async (req, res) => {
             user: userId,
         });
 
-        return res.status(201).send({ message: 'Post cadastrado!' });
+        return res.status(201).send({ message: 'Post publicado!' });
     } catch (err) {
         console.log(err);
         return res.status(400).send({ message: err.message })

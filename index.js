@@ -5,6 +5,7 @@ import connectDatabase from './src/database/db.js';
 import userRoutes from './src/routes/userRoutes.js';
 import authRoutes from './src/routes/authRouters.js';
 import postEventRoutes from './src/routes/eventPostRoutes.js';
+import questionPostRoutes from './src/routes/questionPostRoutes.js';
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use('/user', userRoutes);
 app.use('/auth', authRoutes);
 app.use('/postEvent', postEventRoutes);
+app.use('/questionPost', questionPostRoutes);
 
 connectDatabase()
     .then(() => {
