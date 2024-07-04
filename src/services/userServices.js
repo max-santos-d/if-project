@@ -22,7 +22,6 @@ const updateService = (
         username,
         email,
         password,
-        typeUser,
         avatar,
     });
 

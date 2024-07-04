@@ -48,13 +48,16 @@ const show = async (req, res) => {
 const update = async (req, res) => {
     try {
         const { name, username, email, password, avatar } = req.body;
-        const id = req.user._id;
+        const { _id: idToken } = req.userId;
+        const { _id: idReq } = req.user;
 
         if (!name && !username && !email && !password && !avatar)
             return res.status(400).send({ message: 'Ao menos um campo de ve ser informado!' });
 
+        if(String(idToken) !== String(idReq)) return res.status(400).send({ message: 'Falha na requisição - Você não tem acesso ao usuário!' });
+
         await userServices.updateService(
-            id,
+            idReq,
             name,
             username,
             email,
@@ -105,7 +108,7 @@ const updateTypeUser = async (req, res) => {
                 const [administratorUserUpdate] = typeUserUpdate.filter(el => (el.type === 'administrator'));
                 const [administratorUserRequest] = typeUserRequest.filter(el => (el.type === 'administrator'));
 
-                if(administratorUserRequest.createdAt < administratorUserUpdate.createdAt) return res.status(400).send({ message: 'Não é possivel realizar a operação por o usuário ter criação mais antiga' });
+                if (administratorUserRequest.createdAt < administratorUserUpdate.createdAt) return res.status(400).send({ message: 'Não é possivel realizar a operação por o usuário ter criação mais antiga' });
 
                 await userServices.downgradeAdministratorService(userUpdateId);
                 break;
