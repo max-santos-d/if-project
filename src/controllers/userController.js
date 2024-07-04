@@ -82,41 +82,32 @@ const erase = async (req, res) => {
 
 const updateTypeUser = async (req, res) => {
     try {
-        const { requestUser } = req;
-        const { userUpdate } = req;
+        const { userUpdateId } = req;
+        const { requestUserId } = req;
         const { query: { type } } = req;
 
         if (!type) return res.status(400).send({ message: 'Parâmetro de tipo de usuário deve ser informado!' });
 
         switch (type) {
             case 'organization':
-                await userServices.promotionOrganizationService(userUpdate._id);
+                await userServices.promotionOrganizationService(userUpdateId);
                 break;
             case 'administrator':
-                await userServices.promotionAdministratorService(userUpdate._id);
+                await userServices.promotionAdministratorService(userUpdateId);
                 break;
             case 'downOrganization':
-                await userServices.downgradeOrganizationService(userUpdate._id);
+                await userServices.downgradeOrganizationService(userUpdateId);
                 break;
             case 'downAdministrator':
 
-                /* 
-                tentar arrumar, 
-                usuários com tipo adm podem realizar o procedimento em quem não tem o tipo adm
-                se o usuário também for do tipo adm, o procedimento so pode ser finalizado se o usuário que esta requisitando for adm mais velho.
-                quem tem o tipo adm e tenta realizar a mudança para um usuário, que tem esse tipo, e ele recebeu primeiro, o procedimento n deve acontecer 
-                */
-                const typeUserUpdate = userUpdate.typeUser.find((el) => el.type === 'administrator');
+                const { typeUser: typeUserUpdate } = await userServices.showService(userUpdateId);
+                const { typeUser: typeUserRequest } = await userServices.showService(requestUserId);
+                const [administratorUserUpdate] = typeUserUpdate.filter(el => (el.type === 'administrator'));
+                const [administratorUserRequest] = typeUserRequest.filter(el => (el.type === 'administrator'));
 
-                if(typeUserUpdate){
-                    const createBefore = requestUser.typeUser.find(async (el) => el.createdAt > typeUserUpdate.createdAt);
+                if(administratorUserRequest.createdAt < administratorUserUpdate.createdAt) return res.status(400).send({ message: 'Não é possivel realizar a operação por o usuário ter criação mais antiga' });
 
-                    console.log(createBefore)
-                    
-                    if (!createBefore) return res.status(400).send({ message: 'Não é possivel realizar a operação por o usuário ter criação mais antiga' });                 
-                }
-
-                await userServices.downgradeAdministratorService(userUpdate._id);
+                await userServices.downgradeAdministratorService(userUpdateId);
                 break;
             default:
                 return res.status(400).send({ message: 'Parâmetro para Modificação inválida' });
