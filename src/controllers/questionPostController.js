@@ -2,13 +2,14 @@ import questionPostService from '../services/questionPostServices.js';
 
 const store = async (req, res) => {
     try {
-        const { text} = req.body;
+        const { text } = req.body;
+        const { userId } = req;
 
         if (!text) return res.status(400).send({ message: 'Campos obrigatórios em falta!' });
 
         await questionPostService.storeService({
             text,
-            user: '66858d2416c4d840f458dbac',
+            user: userId,
         });
 
         return res.status(200).send({ message: 'Pergunta publicada!' });
@@ -36,6 +37,7 @@ const index = async (req, res) => {
                         avatar: key.user.avatar,
                     },
                     likes: key.likes,
+                    comments: key.comments,
                     created_at: key.created_at,
                     updated_at: key.updated_at,
                 }
@@ -61,6 +63,9 @@ const show = async (req, res) => {
                     userAvatar: post.user.avatar,
                 },
                 likes: post.likes,
+                comments: post.comments,
+                created_at: post.created_at,
+                updated_at: post.updated_at,
             },
         });
     } catch (err) {
@@ -88,7 +93,7 @@ const update = async (req, res) => {
 
 const erase = async (req, res) => {
     try {
-        const {_id} = req.post;
+        const { _id } = req.post;
 
         await questionPostService.deleteService(_id);
         return res.status(200).send({ message: 'Post apagado!' });

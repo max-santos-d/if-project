@@ -18,6 +18,10 @@ const QuestionPostSchema = new mongoose.Schema({
         type: Array,
         require: true,
     },
+    comments: {
+        type: Array,
+        require: true,
+    }
 },
     // Adicionando campos created_at e updated_at automaticamente
     {
