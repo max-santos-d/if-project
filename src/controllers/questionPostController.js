@@ -8,8 +8,6 @@ const store = async (req, res) => {
 
         await questionPostService.store({
             text,
-            tags,
-            img,
             user: '66858d2416c4d840f458dbac',
         });
 
@@ -31,8 +29,6 @@ const index = async (req, res) => {
                 {
                     id: key._id,
                     text: key.text,
-                    img: key.img,
-                    tags: key.tags,
                     status: key.status,
                     user: {
                         name: key.user.name,
@@ -44,7 +40,7 @@ const index = async (req, res) => {
                     updated_at: key.updated_at,
                 }
             )),
-        );        
+        );
     } catch (err) {
         console.log(err);
         return res.status(400).send({ message: 'Erro inesperado ao realizar requisição!' });
@@ -59,8 +55,6 @@ const show = async (req, res) => {
             response: {
                 id: post._id,
                 text: post.text,
-                img: post.img,
-                tags: post.tags,
                 user: {
                     name: post.user.name,
                     userName: post.user.username,
@@ -75,8 +69,28 @@ const show = async (req, res) => {
     };
 };
 
+const update = async (req, res) => {
+    try {
+        const { text } = req.body;
+        const { _id } = req.post;
+
+        if (!text) return res.status(400).send({ message: 'Compo obrigatório <text> não informado!' });
+
+        await questionPostService.updateService(_id, text);
+
+        return res.status(200).send({ message: 'Post atualizado!' });
+
+    } catch (err) {
+        console.log(err);
+        return res.status(400).send({ message: 'Erro inisperado ao realizar requisição!' });
+    };
+};
+
+
+
 export default {
     store,
     index,
     show,
+    update,
 };

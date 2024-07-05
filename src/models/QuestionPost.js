@@ -5,13 +5,6 @@ const QuestionPostSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
-    img: [{
-        type: String
-    }],
-    tags: [{
-        type: String,
-        require: true,
-    }],
     status: {
         type: Boolean,
         default: true,
