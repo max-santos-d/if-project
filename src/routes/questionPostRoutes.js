@@ -9,5 +9,6 @@ routes.post('/', questionPostController.store);
 routes.get('/', questionPostController.index);
 routes.get('/:id', postIdValidation, questionPostController.show);
 routes.patch('/:id', postIdValidation, questionPostController.update);
+routes.delete('/:id', postIdValidation, questionPostController.erase);
 
 export default routes;

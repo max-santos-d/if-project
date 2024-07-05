@@ -29,6 +29,8 @@ const index = async (req, res) => {
     try {
         const eventPost = await eventPostServices.indexService();
 
+        if (!eventPost.length) return res.status(200).send({ message: 'Nenhuma publicação encontrada!' });
+
         return res.status(200).send(eventPost.map(item => ({
             id: item._id,
             title: item.title,

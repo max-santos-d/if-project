@@ -2,11 +2,11 @@ import questionPostService from '../services/questionPostServices.js';
 
 const store = async (req, res) => {
     try {
-        const { text, img, tags } = req.body;
+        const { text} = req.body;
 
-        if (!text || !tags) return res.status(400).send({ message: 'Campos obrigatórios em falta!' });
+        if (!text) return res.status(400).send({ message: 'Campos obrigatórios em falta!' });
 
-        await questionPostService.store({
+        await questionPostService.storeService({
             text,
             user: '66858d2416c4d840f458dbac',
         });
@@ -22,7 +22,7 @@ const index = async (req, res) => {
     try {
         const data = await questionPostService.indexService();
 
-        if (!data) return res.status(200).send({ message: 'Nenhuma publicação encontrada!' });
+        if (!data.length) return res.status(200).send({ message: 'Nenhuma publicação encontrada!' });
 
         return res.status(200).send(
             data.map(key => (
@@ -86,11 +86,22 @@ const update = async (req, res) => {
     };
 };
 
+const erase = async (req, res) => {
+    try {
+        const {_id} = req.post;
 
+        await questionPostService.deleteService(_id);
+        return res.status(200).send({ message: 'Post apagado!' });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).send({ message: 'Erro inisperado ao realizar requisição!' });
+    };
+};
 
 export default {
     store,
     index,
     show,
     update,
+    erase,
 };
