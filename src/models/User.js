@@ -30,14 +30,6 @@ const UserSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
-    favoriteEvents: {
-        type: Array,
-        require: true,
-    },
-    favoriteQuestions: {
-        type: Array,
-        require: true,
-    },
 });
 
 UserSchema.pre('save', async function (next) {
