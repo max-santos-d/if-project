@@ -7,7 +7,7 @@ const store = async (req, res) => {
         if (!name || !username || !email || !password || !avatar)
             return res.send({ message: 'Campos obrigatórios em falta!' });
 
-        const user = await userServices.storeService(
+        const newUser = await userServices.storeService(
             name,
             username,
             email,
@@ -15,13 +15,16 @@ const store = async (req, res) => {
             avatar
         );
 
-        if (!user) return res.status(400).send({ message: 'Erro ao criar usuário!' });
+        if (!newUser) return res.status(400).send({ message: 'Erro ao criar usuário!' });
 
-        res.status(200).send(user);
+        res.status(200).send(newUser);
 
     } catch (err) {
-        console.log(err);
-        res.status(400).send({ message: err.message });
+        const messsageError = err.message.split(' ')
+
+        if (messsageError[0] === 'E11000') res.status(400).send({ message: 'E-mail de usuário já existente!' });
+
+        return res.status(500).send({ message: "Erro inesperado ao realizar ação!" });
     };
 };
 
@@ -29,35 +32,62 @@ const index = async (req, res) => {
     try {
         const users = await userServices.indexService();
 
-        return res.status(200).send(users);
+        if (!users.length) return res.status(200).send({ message: 'Nenhum usuário encontrado!' });
+
+
+
+        return res.status(200).send(users.map(user => ({
+            id: user._id,
+            name: user.name,
+            username: user.username,
+            email: user.email,
+            avatar: user.avatar,
+            created_at: user.created_at,
+            updated_at: user.updated_at,
+        })));
     } catch (err) {
         console.log(err);
-        res.status(500).send({ message: err.message });
+        res.status(500).send({ message: "Erro inesperado ao realizar ação!" });
     };
 };
 
 const show = async (req, res) => {
     try {
-        return res.status(200).send(req.user);
+        const { userParams: user } = req;
+
+        if (!user) return res.status(400).send({ message: 'Usuário não encontrado!' });
+
+        return res.status(200).send({
+            response: {
+                id: user._id,
+                name: user.name,
+                username: user.username,
+                email: user.email,
+                userType: user.userType,
+                avatar: user.avatar,
+                created_at: user.created_at,
+                updated_at: user.updated_at,
+            }
+        });
     } catch (err) {
         console.log(err);
-        res.status(500).send({ message: err.message });
+        res.status(500).send({ message: "Erro inesperado ao realizar ação!" });
     };
 };
 
 const update = async (req, res) => {
     try {
         const { name, username, email, password, avatar } = req.body;
-        const { _id: idToken } = req.userId;
-        const { _id: idReq } = req.user;
+        const { _id: tokenId } = req.requestUserTokenId;
 
         if (!name && !username && !email && !password && !avatar)
-            return res.status(400).send({ message: 'Ao menos um campo de ve ser informado!' });
+            return res.status(400).send({ message: 'Ao menos um campo deve ser informado!' });
 
-        if(String(idToken) !== String(idReq)) return res.status(400).send({ message: 'Falha na requisição - Você não tem acesso ao usuário!' });
+        // const { reqId } = req.userParams._id;
+        // if (String(tokenId) !== String(reqId)) return res.status(400).send({ message: 'Falha na requisição - Você não tem acesso ao usuário!' });
 
         await userServices.updateService(
-            idReq,
+            tokenId,
             name,
             username,
             email,
@@ -68,33 +98,42 @@ const update = async (req, res) => {
         return res.status(200).send({ message: 'Usuário atualizado!' });
     } catch (err) {
         console.log(err);
-        res.status(500).send({ message: err.message });
+        res.status(500).send({ message: "Erro inesperado ao realizar ação!" });
     };
 };
 
 const erase = async (req, res) => {
     try {
-        const { _id: idToken } = req.userId;
-        const { _id: idReq } = req.user;
+        const { _id: tokenId } = req.requestUserTokenId;
 
-        if(String(idToken) !== String(idReq)) return res.status(400).send({ message: 'Falha na requisição - Você não tem acesso ao usuário!' });
-        
-        await userServices.deleteService(req.user._id);
+        await userServices.deleteService(tokenId);
 
         return res.status(200).send({ message: 'Usuário Apagado!' });
     } catch (err) {
         console.log(err);
-        res.status(500).send({ message: err.message });
+        res.status(500).send({ message: "Erro inesperado ao realizar ação!" });
     };
 };
 
-const updateTypeUser = async (req, res) => {
+const userTypeUpdate = async (req, res) => {
     try {
-        const { userUpdateId } = req;
+        const { id: userUpdateId } = req.params;
         const { requestUserId } = req;
         const { query: { type } } = req;
-
+        
         if (!type) return res.status(400).send({ message: 'Parâmetro de tipo de usuário deve ser informado!' });
+        if (type !== 'organization' && type !== 'administrator' && type !== 'downOrganization' && type !== 'downAdministrator')
+            return res.status(400).send({ message: 'Parâmetro informado inválido!' });
+
+        const { userType: typeUserUpdate } = await userServices.showService(userUpdateId);
+        const [administratorUserUpdate] = typeUserUpdate.filter(el => (el.type === 'administrator'));
+
+        if(administratorUserUpdate) {
+            const { userType: typeUserRequest } = await userServices.showService(requestUserId);
+            const [administratorUserRequest] = typeUserRequest.filter(el => (el.type === 'administrator'));    
+
+            if (administratorUserRequest.created_at > administratorUserUpdate.created_at) return res.status(400).send({ message: 'Não é possivel realizar a operação por o usuário ter administração mais antiga' });
+        };
 
         switch (type) {
             case 'organization':
@@ -107,14 +146,6 @@ const updateTypeUser = async (req, res) => {
                 await userServices.downgradeOrganizationService(userUpdateId);
                 break;
             case 'downAdministrator':
-
-                const { typeUser: typeUserUpdate } = await userServices.showService(userUpdateId);
-                const { typeUser: typeUserRequest } = await userServices.showService(requestUserId);
-                const [administratorUserUpdate] = typeUserUpdate.filter(el => (el.type === 'administrator'));
-                const [administratorUserRequest] = typeUserRequest.filter(el => (el.type === 'administrator'));
-
-                if (administratorUserRequest.createdAt < administratorUserUpdate.createdAt) return res.status(400).send({ message: 'Não é possivel realizar a operação por o usuário ter criação mais antiga' });
-
                 await userServices.downgradeAdministratorService(userUpdateId);
                 break;
             default:
@@ -124,7 +155,7 @@ const updateTypeUser = async (req, res) => {
         return res.status(200).send({ message: 'Usuário atualizado!' });
     } catch (err) {
         console.log(err);
-        res.status(400).send({ message: "Erro inesperado ao realizar ação!" });
+        res.status(500).send({ message: "Erro inesperado ao realizar ação!" });
     };
 };
 
@@ -134,5 +165,5 @@ export default {
     show,
     update,
     erase,
-    updateTypeUser,
+    userTypeUpdate,
 };

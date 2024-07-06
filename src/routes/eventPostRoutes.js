@@ -1,17 +1,17 @@
 import {Router} from 'express';
 
 import eventPostController from '../controllers/eventPostController.js';
-import {authMiddleware} from '../middlewares/authMiddleware.js';
-import { isValid } from '../middlewares/globalMiddleware.js';
+import {authCheckerMiddleware} from '../middlewares/authMiddleware.js';
+import { userIdValidation } from '../middlewares/globalMiddleware.js';
 
 const routes = Router();
 
-routes.post('/', authMiddleware, eventPostController.store);
+routes.post('/', authCheckerMiddleware, eventPostController.store);
 routes.get('/', eventPostController.index);
 routes.get('/search', eventPostController.show);
-routes.patch('/:id', authMiddleware, isValid, eventPostController.update);
-routes.delete('/:id', authMiddleware, isValid, eventPostController.erase);
+routes.patch('/:id', authCheckerMiddleware, userIdValidation, eventPostController.update);
+routes.delete('/:id', authCheckerMiddleware, userIdValidation, eventPostController.erase);
 
-routes.patch('/like/:id', authMiddleware, eventPostController.like);
+routes.patch('/like/:id', authCheckerMiddleware, eventPostController.like);
 
 export default routes;

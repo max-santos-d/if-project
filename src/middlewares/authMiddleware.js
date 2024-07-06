@@ -1,15 +1,16 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import mongoose from "mongoose";
 
 import userServices from '../services/userServices.js';
 
 dotenv.config();
 
-export const authMiddleware = (req, res, next) => {
+export const authCheckerMiddleware = (req, res, next) => {
     try {
         const { authorization } = req.headers;
 
-        if (!authorization) return res.sendStatus(401);
+        if (!authorization) return res.sendStatus(401).send({ message: 'Token de autorização não informado!' });
 
         const [schema, token] = authorization.split(' ');
 
@@ -17,35 +18,38 @@ export const authMiddleware = (req, res, next) => {
         if (schema !== 'Bearer') return res.sendStatus(401);
 
         jwt.verify(token, process.env.SECRET_JWT, async (err, decoded) => {
-            if (err) return res.status(401).send({ message: 'Token inválido!' });
+            err && console.log(err);
+            if (err) return res.status(401).send({ message: 'Erro na decodificação do Token!' });
 
-            const userRequest = await userServices.showService(decoded.id);
+            const tokenId = decoded.id;
 
-            if (!userRequest || !userRequest._id) return res.status(401).send({ message: 'Usuário inválido!' });
+            if (!mongoose.Types.ObjectId.isValid(tokenId)) return res.status(400).send({ message: 'ID de Token inválido' });
 
-            req.userId = userRequest._id;
+            const requestUserToken = await userServices.showService(tokenId);
+
+            if (!requestUserToken) return res.status(401).send({ message: 'Usuário do Token não encontrado!' });
+
+            req.requestUserTokenId = requestUserToken._id;
             return next();
         });
     } catch (err) {
         console.log(err);
-        res.status(400).send({ message: err.message });
+        res.status(500).send({ message: "Erro inesperado ao realizar requisição!" });
     };
 };
 
-export const authMiddlewareAdm = async (req, res, next) => {
+export const adminAuthCheckerMiddleware = async (req, res, next) => {
     try {
-        const { userId } = req;
-        const { user: { _id } } = req;
-        const { typeUser } = await userServices.showService(userId);
-        const administrator = typeUser.filter(el => (el.type === 'administrator'));    
-        
-        if (!administrator.length) return res.status(400).send({ message: 'Sem permição para realizar a operação!' });
-            
-        req.userUpdateId = _id;
-        req.requestUserId = userId;
+        const { requestUserTokenId } = req;
+        const { userType } = await userServices.showService(requestUserTokenId);
+        const adminField = userType.filter(el => (el.type === 'administrator'));
+
+        if (!adminField.length) return res.status(400).send({ message: 'Sem permição para realizar a operação!' });
+
+        req.requestUserId = requestUserTokenId;
         return next();
     } catch (err) {
         console.log(err);
-        res.status(400).send({ message: "Erro ao efetivar nível de autenticação!" });
+        res.status(500).send({ message: "Erro ao efetivar nível de autenticação!" });
     };
 };

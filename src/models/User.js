@@ -22,7 +22,7 @@ const UserSchema = new mongoose.Schema({
         require: true,
         select: false,
     },
-    typeUser: {
+    userType: {
         type: Array,
         require: true,
     },
@@ -30,7 +30,15 @@ const UserSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
-});
+},
+    // Adicionando campos created_at e updated_at automaticamente
+    {
+        timestamps: {
+            createdAt: 'created_at',
+            updatedAt: 'updated_at'
+        }
+    }
+);
 
 UserSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, 8);
