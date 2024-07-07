@@ -3,13 +3,13 @@ import questionPostService from '../services/questionPostServices.js';
 const store = async (req, res) => {
     try {
         const { text } = req.body;
-        const { userId } = req;
+        const { requestUserTokenId } = req;
 
         if (!text) return res.status(400).send({ message: 'Campos obrigatórios em falta!' });
 
         await questionPostService.storeService({
             text,
-            user: userId,
+            user: requestUserTokenId,
         });
 
         return res.status(200).send({ message: 'Pergunta publicada!' });
@@ -32,9 +32,9 @@ const index = async (req, res) => {
                     text: key.text,
                     status: key.status,
                     user: {
-                        name: key.user.name,
-                        username: key.user.username,
-                        avatar: key.user.avatar,
+                        name: key.user?.name,
+                        username: key.user?.username,
+                        avatar: key.user?.avatar,
                     },
                     likes: key.likes,
                     comments: key.comments,
@@ -51,16 +51,16 @@ const index = async (req, res) => {
 
 const show = async (req, res) => {
     try {
-        const { post } = req;
+        const post = await questionPostService.showService(req.params.id);
 
         return res.status(200).send({
             response: {
                 id: post._id,
                 text: post.text,
                 user: {
-                    name: post.user.name,
-                    userName: post.user.username,
-                    userAvatar: post.user.avatar,
+                    name: post.user?.name,
+                    userName: post.user?.username,
+                    userAvatar: post.user?.avatar,
                 },
                 likes: post.likes,
                 comments: post.comments,
@@ -76,30 +76,47 @@ const show = async (req, res) => {
 
 const update = async (req, res) => {
     try {
+        const { _id: tokenId } = req.requestUserTokenId;
+        const { id } = req.params;
         const { text } = req.body;
-        const { _id } = req.post;
 
         if (!text) return res.status(400).send({ message: 'Compo obrigatório <text> não informado!' });
+        
+        const updatePost = await questionPostService.showService(id);
+        
+        if (!updatePost) return res.status(400).send({ message: 'Post para edição não encontrado!' });
 
-        await questionPostService.updateService(_id, text);
+        const postUserIdUpdate = updatePost.user?._id || '';
 
+        if (!postUserIdUpdate) return res.status(400).send({ message: 'Post sem usuário definido!' });
+        if (String(tokenId) !== String(postUserIdUpdate)) return res.status(400).send({ message: 'Usuário não correspondente com o criador do Post!' });
+
+        await questionPostService.updateService(req.params.id, text);
         return res.status(200).send({ message: 'Post atualizado!' });
-
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ message: 'Erro inisperado ao realizar requisição!' });
+        return res.status(400).send({ message: 'Erro inesperado ao realizar requisição!' });
     };
 };
 
 const erase = async (req, res) => {
     try {
-        const { _id } = req.post;
+        const { _id: tokenId } = req.requestUserTokenId;
+        const { id } = req.params;
+        const deletePost = await questionPostService.showService(id);
+        
+        if (!deletePost) return res.status(400).send({ message: 'Post para apagar não encontrado!' });
 
-        await questionPostService.deleteService(_id);
+        const postUserIdDelete = deletePost.user?._id || '';
+
+        if (!postUserIdDelete) return res.status(400).send({ message: 'Post sem usuário definido!' });
+        if (String(tokenId) !== String(postUserIdDelete)) return res.status(400).send({ message: 'Usuário não correspondente com o criador do Post!' });
+        
+        await questionPostService.deleteService(id);
         return res.status(200).send({ message: 'Post apagado!' });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ message: 'Erro inisperado ao realizar requisição!' });
+        return res.status(400).send({ message: 'Erro inesperado ao realizar requisição!' });
     };
 };
 

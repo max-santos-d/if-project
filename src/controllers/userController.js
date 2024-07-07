@@ -83,9 +83,6 @@ const update = async (req, res) => {
         if (!name && !username && !email && !password && !avatar)
             return res.status(400).send({ message: 'Ao menos um campo deve ser informado!' });
 
-        // const { reqId } = req.userParams._id;
-        // if (String(tokenId) !== String(reqId)) return res.status(400).send({ message: 'Falha na requisição - Você não tem acesso ao usuário!' });
-
         await userServices.updateService(
             tokenId,
             name,

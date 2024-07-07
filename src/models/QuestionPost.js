@@ -8,6 +8,10 @@ const QuestionPostSchema = new mongoose.Schema({
     status: {
         type: Boolean,
         default: true,
+    },    
+    status: {
+        type: Boolean,
+        default: true,
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,

@@ -55,7 +55,6 @@ const index = async (req, res) => {
 const show = async (req, res) => {
 
     try {
-
         if (req.query.last) {
             if (req.query.last.toLowerCase() === 'true') {
                 const eventPost = await eventPostServices.showLastService();
