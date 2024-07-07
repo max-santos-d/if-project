@@ -30,6 +30,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
+    status: {
+        type: Boolean,
+        default: true,
+    },
 },
     // Adicionando campos created_at e updated_at automaticamente
     {

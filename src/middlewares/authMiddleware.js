@@ -8,14 +8,14 @@ dotenv.config();
 
 export const authCheckerMiddleware = (req, res, next) => {
     try {
-        const { authorization } = req.headers;
+        const authorization = req.headers.authorization;
 
-        if (!authorization) return res.sendStatus(401).send({ message: 'Token de autorização não informado!' });
+        if (!authorization) return res.status(401).send({ message: 'Token de autorização não informado!' });
 
         const [schema, token] = authorization.split(' ');
 
-        if (!schema || !token) return res.sendStatus(401);
-        if (schema !== 'Bearer') return res.sendStatus(401);
+        if (!schema || !token) return res.status(401).send({ message: 'Erro na leitura do Token!' });
+        if (schema !== 'Bearer') return res.status(401).send({ message: 'Erro na leitura do Token!' });
 
         jwt.verify(token, process.env.SECRET_JWT, async (err, decoded) => {
             err && console.log(err);
@@ -46,10 +46,24 @@ export const adminAuthCheckerMiddleware = async (req, res, next) => {
 
         if (!adminField.length) return res.status(400).send({ message: 'Sem permição para realizar a operação!' });
 
-        req.requestUserId = requestUserTokenId;
         return next();
     } catch (err) {
         console.log(err);
         res.status(500).send({ message: "Erro ao efetivar nível de autenticação!" });
     };
 };
+
+export const organizerAuthCheckerMiddleware = async (req, res, next) => {
+    try{
+        const { requestUserTokenId } = req; 
+        const { userType } = await userServices.showService(requestUserTokenId);
+        const organizerField = userType.filter(el => (el.type === 'organization'));
+
+        if (!organizerField.length) return res.status(400).send({ message: 'Sem permição para realizar a operação!' });
+
+        return next();
+    }catch (err) {
+        console.log(err);
+        res.status(400).send({message: 'Erro ao efetivar nível de autenticação!'});
+    }
+}

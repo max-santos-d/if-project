@@ -5,7 +5,7 @@ import eventPostServices from '../services/eventPostServices.js';
 const store = async (req, res) => {
     try {
         const { title, text, banner } = req.body;
-        const { userId } = req;
+        const { requestUserTokenId } = req;
 
         if (!title || !text || !banner)
             return res.send({ message: "Campos obrigatórios em falta!" });
@@ -14,7 +14,7 @@ const store = async (req, res) => {
             title,
             text,
             banner,
-            user: userId,
+            user: requestUserTokenId,
         });
 
         return res.status(201).send({ message: 'Post publicado!' });
@@ -38,15 +38,17 @@ const index = async (req, res) => {
             banner: item.banner,
             likes: item.likes,
             user: {
-                name: item.user.name,
-                userName: item.user.username,
-                userAvatar: item.user.avatar
-            }
+                name: item.user?.name,
+                userName: item.user?.username,
+                userAvatar: item.user?.avatar,
+            },
+            created_at: item.created_at,
+            updated_at: item.updated_at,
         })));
 
     } catch (err) {
         console.log(err);
-        return res.send({ message: 'Não há Posts cadastrados!' })
+        return res.send({ message: 'Erro inesperado ao realizar requisição!' })
     };
 };
 
@@ -68,10 +70,12 @@ const show = async (req, res) => {
                         banner: eventPost.banner,
                         likes: eventPost.likes,
                         user: {
-                            name: eventPost.user.name,
-                            userName: eventPost.user.username,
-                            userAvatar: eventPost.user.avatar,
-                        }
+                            name: eventPost.user?.name,
+                            userName: eventPost.user?.username,
+                            userAvatar: eventPost.user?.avatar,
+                        },
+                        created_at: item.created_at,
+                        updated_at: item.updated_at,
                     },
                 });
             };
@@ -90,10 +94,12 @@ const show = async (req, res) => {
                     banner: eventPost.banner,
                     likes: eventPost.likes,
                     user: {
-                        name: eventPost.user.name,
-                        userName: eventPost.user.username,
-                        userAvatar: eventPost.user.avatar,
-                    }
+                        name: eventPost.user?.name,
+                        userName: eventPost.user?.username,
+                        userAvatar: eventPost.user?.avatar,
+                    },
+                    created_at: item.created_at,
+                    updated_at: item.updated_at,
                 },
             });
         };
@@ -111,10 +117,12 @@ const show = async (req, res) => {
                     banner: item.banner,
                     likes: item.likes,
                     user: {
-                        name: item.user.name,
-                        userName: item.user.username,
-                        userAvatar: item.user.avatar
-                    }
+                        name: item.user?.name,
+                        userName: item.user?.username,
+                        userAvatar: item.user?.avatar
+                    },
+                    created_at: item.created_at,
+                    updated_at: item.updated_at,
                 })),
             });
         };
@@ -130,18 +138,13 @@ const show = async (req, res) => {
 const update = async (req, res) => {
     try {
         const { body: { title, text, banner } } = req;
-        const postId = req.params.id || '';
-        const validPostId = mongoose.Types.ObjectId.isValid(postId);
-
-        if (!validPostId) return res.status(400).send({ message: 'ID de Post inválido!' });
-
-        const eventPost = await eventPostServices.showService(postId);
-
-        if (!eventPost) return res.status(400).send({ message: 'Post não encontrado!' });
         if (!title && !text && !banner) return res.status(400).send({ message: 'Ao menos um campo obrigatório deve ser informado: title, text ou banner.' })
 
+        const eventPostSearch = await eventPostServices.showService(req.params.id);
+        if (!eventPostSearch) return res.status(400).send({ message: 'Post não encontrado!' });
+
         await eventPostServices.updateService(
-            postId,
+            eventPostSearch._id,
             title,
             text,
             banner,
@@ -150,23 +153,18 @@ const update = async (req, res) => {
         return res.status(200).send({ message: 'Post atualizado!' });
     } catch (err) {
         console.log(err);
-        res.status(400).send({ message: err.message });
+        res.status(400).send({ message: 'Erro inesperado na requisição!' });
     }
 };
 
 const erase = async (req, res) => {
     try {
-        const id = req.params.id;
+        const eventPostSearch = await eventPostServices.showService(req.params.id);
 
-        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).send({ message: 'ID Post inválido!' });
+        if (!eventPostSearch) return res.status(400).send({ message: 'Post não encontrado!' });
 
-        const eventPost = await eventPostServices.showService(id);
-
-        if (!eventPost) return res.status(400).send({ message: 'Post não encontrado!' });
-
-        await eventPostServices.eraseService(id);
+        await eventPostServices.eraseService(eventPostSearch._id);
         res.status(200).send({ message: 'Post Apagado!' });
-
     } catch (err) {
         console.log(err);
         res.status(400).send({ message: err.message });
@@ -177,14 +175,12 @@ const like = async (req, res) => {
 
     try {
         const { params: { id } } = req;
-        const { userId } = req;
+        const { requestUserTokenId } = req;
 
-        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).send({ message: 'ID Post inválido!' });
-
-        const like = await eventPostServices.likeService(id, userId);
+        const like = await eventPostServices.likeService(id, requestUserTokenId);
 
         if (!like) {
-            await eventPostServices.deleteLikeService(id, userId);
+            await eventPostServices.deleteLikeService(id, requestUserTokenId);
             return res.status(200).send({ message: 'LIKE removido!' })
         };
 

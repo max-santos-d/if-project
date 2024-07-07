@@ -118,7 +118,7 @@ const erase = async (req, res) => {
 const userTypeUpdate = async (req, res) => {
     try {
         const { id: userUpdateId } = req.params;
-        const { requestUserId } = req;
+        const { requestUserTokenId } = req;
         const { query: { type } } = req;
         
         if (!type) return res.status(400).send({ message: 'Parâmetro de tipo de usuário deve ser informado!' });
@@ -129,7 +129,7 @@ const userTypeUpdate = async (req, res) => {
         const [administratorUserUpdate] = typeUserUpdate.filter(el => (el.type === 'administrator'));
 
         if(administratorUserUpdate) {
-            const { userType: typeUserRequest } = await userServices.showService(requestUserId);
+            const { userType: typeUserRequest } = await userServices.showService(requestUserTokenId);
             const [administratorUserRequest] = typeUserRequest.filter(el => (el.type === 'administrator'));    
 
             if (administratorUserRequest.created_at > administratorUserUpdate.created_at) return res.status(400).send({ message: 'Não é possivel realizar a operação por o usuário ter administração mais antiga' });

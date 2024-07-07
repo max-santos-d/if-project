@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 import userServices from "../services/userServices.js";
-import questionPostServices from "../services/questionPostServices.js";
+import eventPostServices from "../services/eventPostServices.js";
 
 export const idValidation = (req, res, next) => {
     const { id } = req.params;
@@ -30,13 +30,8 @@ export const userIdValidation = async (req, res, next) => {
 
 export const postIdValidation = async (req, res, next) => {
     try{
-        const {id: postId} = req.params;
-
-        const post = await questionPostServices.showService(postId);
-
+        const post = await eventPostServices.showService(req.params.id);
         if(!post) return res.status(400).send({message: 'Post não encontrado!'});
-
-        req.post = post;
         next();
     }catch (err) {
         console.log(err);
