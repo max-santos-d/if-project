@@ -73,8 +73,8 @@ const show = async (req, res) => {
                             userName: eventPost.user?.username,
                             userAvatar: eventPost.user?.avatar,
                         },
-                        created_at: item.created_at,
-                        updated_at: item.updated_at,
+                        created_at: eventPost.created_at,
+                        updated_at: eventPost.updated_at,
                     },
                 });
             };
@@ -97,8 +97,8 @@ const show = async (req, res) => {
                         userName: eventPost.user?.username,
                         userAvatar: eventPost.user?.avatar,
                     },
-                    created_at: item.created_at,
-                    updated_at: item.updated_at,
+                    created_at: eventPost.created_at,
+                    updated_at: eventPost.updated_at,
                 },
             });
         };
