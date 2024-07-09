@@ -1,5 +1,3 @@
-import mongoose from 'mongoose';
-
 import eventPostServices from '../services/eventPostServices.js';
 
 const store = async (req, res) => {

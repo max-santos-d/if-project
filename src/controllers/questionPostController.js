@@ -53,6 +53,8 @@ const show = async (req, res) => {
     try {
         const post = await questionPostService.showService(req.params.id);
 
+        if(!post) return res.status(200).send({ message: 'Nenhuma publicação encontrada!' });
+
         return res.status(200).send({
             response: {
                 id: post._id,
